@@ -31,7 +31,8 @@ const navigation = [
 ]
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { data: session } = useSession()
+  const sessionResult = useSession();
+  const session = sessionResult?.data;
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 

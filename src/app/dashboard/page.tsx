@@ -85,7 +85,8 @@ const recentActivity = [
 ]
 
 export default function Dashboard() {
-  const { data: session } = useSession()
+  const sessionResult = useSession();
+  const session = sessionResult?.data;
 
   return (
     <DashboardLayout>

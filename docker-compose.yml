@@ -60,8 +60,8 @@ services:
     container_name: burrow-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "4344:80"
+      - "4345:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl

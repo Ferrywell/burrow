@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🐰 Burrow - Festival Group App
 
 De konijnenburcht voor festivalgroepen. Communiceer, deel locaties, beheer onkosten en plan je festival ervaring samen.
@@ -283,3 +284,6 @@ MIT License - zie LICENSE bestand voor details.
 ---
 
 **Burrow** - Maak je festival ervaring onvergetelijk met je groep! 🐰🎵
+=======
+# burrow
+>>>>>>> c5f49bf25167459628df3362471a681f85742fcf

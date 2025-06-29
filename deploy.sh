@@ -36,9 +36,14 @@ mkdir -p $BACKUP_DIR
 # Function to backup database
 backup_database() {
     log "Creating database backup..."
-    BACKUP_FILE="$BACKUP_DIR/burrow_db_$(date +%Y%m%d_%H%M%S).sql"
-    docker exec burrow-db pg_dump -U burrow_user burrow > $BACKUP_FILE
-    log "Database backup created: $BACKUP_FILE"
+    # Check if database container exists before trying to backup
+    if docker ps -a --format "table {{.Names}}" | grep -q "burrow-db"; then
+        BACKUP_FILE="$BACKUP_DIR/burrow_db_$(date +%Y%m%d_%H%M%S).sql"
+        docker exec burrow-db pg_dump -U burrow_user burrow > $BACKUP_FILE
+        log "Database backup created: $BACKUP_FILE"
+    else
+        warning "Database container does not exist yet, skipping backup"
+    fi
 }
 
 # Function to restore database
@@ -74,7 +79,7 @@ deploy() {
         git pull origin main
     fi
     
-    # Backup database before deployment
+    # Backup database before deployment (only if container exists)
     backup_database
     
     # Build and start containers
@@ -108,7 +113,7 @@ rollback() {
     docker-compose -f $DOCKER_COMPOSE_FILE down
     
     # Restore from latest backup
-    LATEST_BACKUP=$(ls -t $BACKUP_DIR/*.sql | head -1)
+    LATEST_BACKUP=$(ls -t $BACKUP_DIR/*.sql 2>/dev/null | head -1)
     if [ -n "$LATEST_BACKUP" ]; then
         restore_database $LATEST_BACKUP
     fi

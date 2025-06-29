@@ -1,0 +1,307 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Group relationships
+  groupMemberships GroupMember[]
+  
+  // Location sharing
+  locations Location[]
+  
+  // Expenses
+  expenses Expense[]
+  expenseShares ExpenseShare[]
+  
+  // Transportation
+  vehicles Vehicle[]
+  transportAssignments TransportAssignment[]
+  
+  // Tent assignments
+  tentAssignments TentAssignment[]
+  
+  // Festival preferences
+  artistPreferences ArtistPreference[]
+  
+  // Messages
+  messages Message[]
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Members
+  members GroupMember[]
+  
+  // Expenses
+  expenses Expense[]
+  
+  // Transportation
+  vehicles Vehicle[]
+  transportAssignments TransportAssignment[]
+  
+  // Tents
+  tents Tent[]
+  tentAssignments TentAssignment[]
+  
+  // Festival
+  festivalId String?
+  festival   Festival? @relation(fields: [festivalId], references: [id])
+
+  // Messages
+  messages Message[]
+}
+
+model GroupMember {
+  id      String @id @default(cuid())
+  userId  String
+  groupId String
+  role    GroupRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
+}
+
+model Festival {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  location    String
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Groups attending this festival
+  groups Group[]
+  
+  // Artists performing at this festival
+  artists Artist[]
+  
+  // Stages/Podiums
+  stages Stage[]
+}
+
+model Artist {
+  id        String   @id @default(cuid())
+  name      String
+  genre     String?
+  image     String?
+  festivalId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  festival Festival @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  
+  // Performances
+  performances Performance[]
+  
+  // User preferences
+  preferences ArtistPreference[]
+}
+
+model Stage {
+  id        String   @id @default(cuid())
+  name      String
+  festivalId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  festival Festival @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  
+  // Performances on this stage
+  performances Performance[]
+}
+
+model Performance {
+  id        String   @id @default(cuid())
+  artistId  String
+  stageId   String
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  stage  Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
+}
+
+model ArtistPreference {
+  id       String @id @default(cuid())
+  userId   String
+  artistId String
+  priority Int    @default(1) // 1 = hoogste prioriteit
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, artistId])
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  userId    String
+  latitude  Float
+  longitude Float
+  accuracy  Float?
+  timestamp DateTime @default(now())
+  isSharing Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  groupId     String
+  paidById    String
+  description String
+  amount      Float
+  currency    String  @default("EUR")
+  date        DateTime @default(now())
+  category    ExpenseCategory
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidBy  User   @relation(fields: [paidById], references: [id])
+  
+  // Who shares in this expense
+  shares ExpenseShare[]
+}
+
+model ExpenseShare {
+  id        String @id @default(cuid())
+  expenseId String
+  userId    String
+  share     Float  // Percentage of bedrag
+  createdAt DateTime @default(now())
+
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([expenseId, userId])
+}
+
+enum ExpenseCategory {
+  FOOD
+  DRINKS
+  TRANSPORT
+  ACCOMMODATION
+  TICKETS
+  SUPPLIES
+  OTHER
+}
+
+model Vehicle {
+  id          String   @id @default(cuid())
+  groupId     String
+  ownerId     String
+  licensePlate String?
+  make        String?
+  model       String?
+  year        Int?
+  capacity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  owner User  @relation(fields: [ownerId], references: [id])
+  
+  // Assignments for this vehicle
+  assignments TransportAssignment[]
+}
+
+model TransportAssignment {
+  id        String @id @default(cuid())
+  vehicleId String
+  userId    String
+  groupId   String
+  createdAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([vehicleId, userId])
+}
+
+model Tent {
+  id        String   @id @default(cuid())
+  groupId   String
+  name      String
+  capacity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  
+  // Assignments for this tent
+  assignments TentAssignment[]
+}
+
+model TentAssignment {
+  id      String @id @default(cuid())
+  tentId  String
+  userId  String
+  groupId String
+  createdAt DateTime @default(now())
+
+  tent  Tent  @relation(fields: [tentId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([tentId, userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  userId    String
+  groupId   String
+  content   String
+  type      MessageType @default(TEXT)
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+enum MessageType {
+  TEXT
+  LOCATION_REQUEST
+  LOCATION_SHARE
+  PING
+}

@@ -1,0 +1,101 @@
+{
+  "name": "Burrow - Festival Group App",
+  "short_name": "Burrow",
+  "description": "De konijnenburcht voor festivalgroepen. Communiceer, deel locaties, beheer onkosten en plan je festival ervaring samen.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#8B5CF6",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "nl",
+  "categories": ["social", "lifestyle", "travel"],
+  "icons": [
+    {
+      "src": "/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nieuwe Chat",
+      "short_name": "Chat",
+      "description": "Start een nieuwe groepsgesprek",
+      "url": "/chat",
+      "icons": [
+        {
+          "src": "/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Locatie Delen",
+      "short_name": "Locatie",
+      "description": "Deel je locatie met de groep",
+      "url": "/location",
+      "icons": [
+        {
+          "src": "/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Onkosten",
+      "short_name": "Onkosten",
+      "description": "Beheer groepsuitgaven",
+      "url": "/expenses",
+      "icons": [
+        {
+          "src": "/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+} 
